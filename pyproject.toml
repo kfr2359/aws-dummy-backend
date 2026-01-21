@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools", "setuptools-scm", "setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -12,3 +12,7 @@ dependencies = [
 
 [tool.setuptools.packages]
 find = { }
+
+[tool.setuptools-git-versioning]
+enabled = true
+dirty_template = "{tag}.post{ccount}+dirty"
