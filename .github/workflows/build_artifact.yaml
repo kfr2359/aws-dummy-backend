@@ -11,18 +11,15 @@ jobs:
     - uses: actions/checkout@v6
       with:
         persist-credentials: false
-        
+
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
         python-version: "3.x"
 
-    - name: Install pypa/build
-      run: >-
-        python3 -m
-        pip install
-        build
-        --user
+    - name: Install build dependencies
+      run: |
+        python3 -m pip install build setuptools_scm
 
     - name: Build a binary wheel and a source tarball
       run: python3 -m build
