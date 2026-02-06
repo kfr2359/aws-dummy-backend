@@ -8,6 +8,11 @@ dynamic = ["version"]
 dependencies = [
     "fastapi[standard]",
     "ec2_metadata",
+    "boto3",
+    "SQLAlchemy>=2.0",
+    # DB drivers (use the one that matches DB_URL):
+    # - postgresql+psycopg://...
+    "psycopg[binary]",
 ]
 
 [tool.setuptools.packages]
@@ -16,3 +21,9 @@ find = { }
 [tool.setuptools-git-versioning]
 enabled = true
 dirty_template = "{tag}.post{ccount}+dirty"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "httpx",
+]
