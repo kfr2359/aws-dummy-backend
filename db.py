@@ -5,6 +5,7 @@ from typing import Generator
 from sqlalchemy import DateTime, Integer, String, func
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.pool import StaticPool
 from sqlalchemy import create_engine
 
 
@@ -33,7 +34,9 @@ def get_engine() -> Engine:
         _ENGINE = create_engine(
             db_url,
             pool_pre_ping=True,
-            future=True,
+            echo=True,
+            connect_args={'check_same_thread':False},
+            poolclass=StaticPool,
         )
     return _ENGINE
 
@@ -90,4 +93,5 @@ def init_db(engine: Engine) -> None:
     For a small demo-style service this is a pragmatic replacement for migrations.
     """
     Base.metadata.create_all(bind=engine)
+    pass
 

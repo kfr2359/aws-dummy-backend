@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from db import Image, get_db
-from s3_client import delete_image, download_image, generate_s3_key, normalize_extension, upload_image
+import s3_client
 
 
 router = APIRouter()
@@ -79,7 +79,7 @@ def download_by_name(name: str, db: Session = Depends(get_db)):
     image = _get_by_name(db, name)
 
     try:
-        obj = download_image(key=image.s3_key)
+        obj = s3_client.download_image(key=image.s3_key)
     except Exception as e:  # boto3 raises various exception types
         raise HTTPException(status_code=502, detail="Failed to download from S3") from e
 
@@ -109,7 +109,7 @@ def upload(
     path = Path(filename)
 
     try:
-        extension = normalize_extension(path.suffix or "")
+        extension = s3_client.normalize_extension(path.suffix or "")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -118,7 +118,7 @@ def upload(
         raise HTTPException(status_code=400, detail="Image name is required")
 
     try:
-        key = generate_s3_key(final_name, extension)
+        key = s3_client.generate_s3_key(final_name, extension)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -134,7 +134,7 @@ def upload(
     content_type = file.content_type or _guess_content_type(final_name, extension)
 
     try:
-        upload_image(fileobj=io.BytesIO(data), key=key, content_type=content_type)
+        s3_client.upload_image(fileobj=io.BytesIO(data), key=key, content_type=content_type)
     except Exception as e:
         raise HTTPException(status_code=502, detail="Failed to upload to S3") from e
 
@@ -176,7 +176,7 @@ def delete_by_name(name: str, db: Session = Depends(get_db)):
     image = _get_by_name(db, name)
 
     try:
-        delete_image(key=image.s3_key)
+        s3_client.delete_image(key=image.s3_key)
     except Exception as e:
         raise HTTPException(status_code=502, detail="Failed to delete from S3") from e
 
